@@ -1,12 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const upload = require('./middelware/multerUplode');
+const path = require('path');
 
 const app = express();
 app.use(cors({
   origin: "*" 
 }));
 app.use(express.json());
+// Serve static files from the 'public' directory
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,15 +19,17 @@ mongoose.connect( 'mongodb://localhost:27017/postsdb');
 // mongoose.connect( 'mongodb://localhost:27017/postsdb');
 
 // Define a Post model
-const postSchema = new mongoose.Schema({
+const blogSchema = new mongoose.Schema({
   userId: Number,
   id : Number,
   title: String,
-  body: String
+  body: String,
+  image:Object
+
   
 });
 
-const Post = mongoose.model('Post', postSchema);
+const Blog = mongoose.model('Blog', blogSchema);
 
 // const todosSchema = new mongoose.Schema({
 //   userId: Number,
@@ -37,15 +43,17 @@ const Post = mongoose.model('Post', postSchema);
 
 // CRUD endpoints s
 
-app.get('/api/posts', async (req, res) => {
-  const posts = await Post.find();
-  res.status(200).json(posts);
+app.get('/api/blogs', async (req, res) => {
+  const blogs = await Blog.find();
+  res.status(200).json(blogs);
 });
 
-app.get('/api/posts/:id', async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  res.json(post);
+app.get('/api/blogs/:id', async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  res.json(blog);
 });
+
+
 
 // app.post( '/api/todos', async (req, res) => {
 //   const todos = new Todos(req.body)
@@ -53,26 +61,32 @@ app.get('/api/posts/:id', async (req, res) => {
 //   res.status(200).send(todos);
 // });
 
-app.get('/api/todos', async (req, res) => {
-  const todos = await Post.find();
-  res.json(todos);
+// app.get('/api/todos', async (req, res) => {
+//   const todos = await Blog.find();
+//   res.json(todos);
+// });
+
+app.post('/api/blogs', upload, async (req, res) => {
+  const {title,body}=req.body
+  const profile=req.file
+  const blog={title,body,image:profile}
+  const newBlog = new Blog(blog);
+  // console.log(newBlog,"-------------------this is new blog",title,profile)
+
+
+  await newBlog.save();
+  res.status(201).json(newBlog);
 });
 
-app.post('/api/posts', async (req, res) => {
-  const newPost = new Post(req.body);
-  await newPost.save();
-  res.status(201).json(newPost);
-});
-
-app.patch('/api/posts/:id', async (req, res) => {
-  const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
+app.patch('/api/blogs/:id', async (req, res) => {
+  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
-  res.json(updatedPost);
+  res.json(updatedBlog);
 });
 
-app.delete('/api/posts/:id', async (req, res) => {
-  await Post.findByIdAndDelete(req.params.id);
+app.delete('/api/blogs/:id', async (req, res) => {
+  await Blog.findByIdAndDelete(req.params.id);
   res.status(204).end();
 });
 
