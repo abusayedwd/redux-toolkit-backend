@@ -10,7 +10,8 @@ app.use(cors({
 }));
 app.use(express.json());
 // Serve static files from the 'public' directory
-app.use('/public', express.static(path.join(__dirname, 'public')));
+// app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 const PORT = process.env.PORT || 5000;
 
@@ -68,8 +69,8 @@ app.get('/api/blogs/:id', async (req, res) => {
 
 app.post('/api/blogs', upload, async (req, res) => {
   const {title,body}=req.body
-  const profile=req.file
-  const blog={title,body,image:profile}
+  const image=req.file
+  const blog={title,body,image:image}
   const newBlog = new Blog(blog);
   // console.log(newBlog,"-------------------this is new blog",title,profile)
 

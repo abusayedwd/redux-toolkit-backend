@@ -29,7 +29,7 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: MAX_FILE_SIZE }, // Set max file size limit
     fileFilter: fileFilter,
-}).single('profile');
+}).single('image');
 module.exports = upload;
 // .fields([{name:"driverLicenseFront",maxCount:1},
 //     {name:"driverLicenseback",maxCount:1},{name:"icone",maxCount:1},{name:"servicePhoto",maxCount:1},{name:"boutiqueImage",maxCount:1},{name:"productImage1",maxCount:5},{name:"categoryImage",maxCount:1},{name:"reviewImage",maxCount:5},{name:"messageImage",maxCount:3}])
